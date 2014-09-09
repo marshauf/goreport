@@ -1,4 +1,7 @@
 goreport
 ========
 
-A (error) report library for go
+A (error) report library for go.
+
+# ⚠ - Warning
+⚒ ∊ ䷢ - work in progress
