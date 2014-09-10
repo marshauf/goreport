@@ -36,11 +36,12 @@ func (r *Report) Report(formatter Formatter, output io.Writer) {
 		if entry == nil {
 			continue
 		}
-		r.filter(entry)
-		if entry == nil || len(entry) == 0 {
+		entryCopy := entry.Copy()
+		r.filter(entryCopy)
+		if entryCopy == nil || len(entryCopy) == 0 {
 			continue
 		}
-		err = formatter.Write(entry, output)
+		err = formatter.Write(entryCopy, output)
 		if err != nil {
 			panic(err) // TODO panic with report.entries + error
 		}
@@ -57,8 +58,8 @@ func (r *Report) Add(entry Entry) {
 	return
 }
 
-// Clear removes all entries from the report
-func (r *Report) Clear() {
+// Reset removes all entries from the report
+func (r *Report) Reset() {
 	for i := range r.entries {
 		r.entries[i].Clear()
 	}

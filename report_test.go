@@ -63,13 +63,18 @@ func TestReport(t *testing.T) {
 	r.Log(Panic, "%s", &struct {
 		Name string
 	}{Name: "color test for pannic"})
-
-	r.AddFilters(NewConsoleFilter())
+	
+	r.AddFilters(NewConsoleFilter(), NewSeverityFilter(3))
 
 	r.Report(f, b)
+	r.Report(f, b2)
 
-	r.Clear()
+	if b.String() != b2.String() {
+		t.Error("b != b2")
+	}
 
+	b2.Reset()
+	r.Reset()
 	r.Report(f, b2)
 	if b2.Len() > 0 {
 		t.Errorf("After call to r.Clear, r.Report wrote to output: %s", b2.String())

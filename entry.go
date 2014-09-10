@@ -13,3 +13,11 @@ func (e Entry) Clear() {
 		delete(e, key)
 	}
 }
+
+func (e Entry) Copy() Entry {
+	c := make(Entry)
+	for k, v := range e {
+		c[k] = v
+	}
+	return c
+}
