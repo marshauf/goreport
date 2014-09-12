@@ -22,6 +22,30 @@ func New() *Report {
 	}
 }
 
+func (r *Report) Debug(format string, args ...interface{}) {
+	r.Log(Debug, format, args...)
+}
+
+func (r *Report) Info(format string, args ...interface{}) {
+	r.Log(Info, format, args...)
+}
+
+func (r *Report) Warning(format string, args ...interface{}) {
+	r.Log(Warning, format, args...)
+}
+
+func (r *Report) Error(format string, args ...interface{}) {
+	r.Log(Error, format, args...)
+}
+
+func (r *Report) Fatal(format string, args ...interface{}) {
+	r.Log(Fatal, format, args...)
+}
+
+func (r *Report) Panic(format string, args ...interface{}) {
+	r.Log(Panic, format, args...)
+}
+
 func (r *Report) Log(s Severity, format string, args ...interface{}) {
 	entry := make(Entry)
 	entry[EntryKeySeverity] = s
@@ -37,8 +61,8 @@ func (r *Report) Report(formatter Formatter, output io.Writer) {
 			continue
 		}
 		entryCopy := entry.Copy()
-		r.filter(entryCopy)
-		if entryCopy == nil || len(entryCopy) == 0 {
+		ignore := r.filter(entryCopy)
+		if ignore || entryCopy == nil || len(entryCopy) == 0 {
 			continue
 		}
 		err = formatter.Write(entryCopy, output)
@@ -57,15 +81,6 @@ func (r *Report) Add(entry Entry) {
 	r.n++
 	return
 }
-
-// Reset removes all entries from the report
-func (r *Report) Reset() {
-	for i := range r.entries {
-		r.entries[i].Clear()
-	}
-	r.n = 0
-}
-
 func (r *Report) AddFilters(filters ...Filter) {
 	if r.Filters == nil {
 		r.Filters = filters
@@ -74,11 +89,15 @@ func (r *Report) AddFilters(filters ...Filter) {
 	r.Filters = append(r.Filters, filters...)
 }
 
-func (r *Report) filter(entry Entry) {
+func (r *Report) filter(entry Entry) bool {
 	for _, filter := range r.Filters {
 		if filter == nil {
 			continue
 		}
-		filter.Filter(entry)
+		ignore := filter.Filter(entry)
+		if ignore {
+			return true
+		}
 	}
+	return false
 }

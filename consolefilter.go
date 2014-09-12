@@ -25,32 +25,30 @@ const (
 )
 
 type ConsoleFilter struct {
+	SeverityColor map[Severity]int
 }
 
 func NewConsoleFilter() Filter {
-	return &ConsoleFilter{}
+	return &ConsoleFilter{
+		SeverityColor: map[Severity]int{
+			Debug:   ConsoleColorDefaultForeground,
+			Info:    ConsoleColorBlue,
+			Warning: ConsoleColorYellow,
+			Error:   ConsoleColorLightRed,
+			Fatal:   ConsoleColorRed,
+			Panic:   ConsoleColorLightMagenta,
+		},
+	}
 }
 
-func (f *ConsoleFilter) Filter(entry Entry) {
+func (f *ConsoleFilter) Filter(entry Entry) bool {
 	for key, value := range entry {
-		switch key {
-		case EntryKeySeverity:
-			switch value {
-			case Debug:
-				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", ConsoleColorDefaultForeground, entry[key])
-			case Info:
-				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", ConsoleColorBlue, entry[key])
-			case Warning:
-				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", ConsoleColorYellow, entry[key])
-			case Error:
-				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", ConsoleColorLightRed, entry[key])
-			case Fatal:
-				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", ConsoleColorRed, entry[key])
-			case Panic:
-				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", ConsoleColorLightMagenta, entry[key])
+		switch s := value.(type) {
+		case Severity:
+			if color, ok := f.SeverityColor[s]; ok {
+				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", color, entry[key])
 			}
-		case EntryKeyTime:
-		case EntryKeyMessage:
 		}
 	}
+	return false
 }

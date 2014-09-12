@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// TextFormatter
+// Note: Supports fmt %v types and func() string, func(Entry) string as Entry values
 type TextFormatter struct {
 	TimeFormat     string
 	EntrySeperator string

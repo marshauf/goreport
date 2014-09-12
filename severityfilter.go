@@ -10,13 +10,14 @@ func NewSeverityFilter(level int) Filter {
 	}
 }
 
-func (sf *SeverityFilter) Filter(entry Entry) {
+func (sf *SeverityFilter) Filter(entry Entry) bool {
 	if value, ok := entry[EntryKeySeverity]; ok {
 		switch level := value.(type) {
 		case Severity:
 			if level.Less(sf.Level) {
-				entry.Clear()
+				return true
 			}
 		}
 	}
+	return false
 }

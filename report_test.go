@@ -17,6 +17,7 @@ func TestReport(t *testing.T) {
 		b2 *bytes.Buffer = new(bytes.Buffer)
 		f                = NewTextFormatter()
 		r                = New()
+		r2               = New()
 	)
 	if r == nil {
 		t.Fatal("Report is nil")
@@ -63,7 +64,7 @@ func TestReport(t *testing.T) {
 	r.Log(Panic, "%s", &struct {
 		Name string
 	}{Name: "color test for pannic"})
-	
+
 	r.AddFilters(NewConsoleFilter(), NewSeverityFilter(3))
 
 	r.Report(f, b)
@@ -73,10 +74,12 @@ func TestReport(t *testing.T) {
 		t.Error("b != b2")
 	}
 
-	b2.Reset()
-	r.Reset()
-	r.Report(f, b2)
-	if b2.Len() > 0 {
-		t.Errorf("After call to r.Clear, r.Report wrote to output: %s", b2.String())
-	}
+	r2.Debug("%s", "debug")
+	r2.Info("%s", "info")
+	r2.Warning("%s", "warning")
+	r2.Error("%s", "error")
+	r2.Fatal("%s", "fatal")
+	r2.Panic("%s", "panic")
+	b.Reset()
+	r2.Report(NewJsonFormatter(), b)
 }
