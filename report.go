@@ -54,7 +54,7 @@ func (r *Report) Log(s Severity, format string, args ...interface{}) {
 	r.Add(entry)
 }
 
-func (r *Report) Report(formatter Formatter, output io.Writer) {
+func (r *Report) Report(formatter Formatter, output io.Writer) error {
 	var err error
 	for _, entry := range r.entries {
 		if entry == nil {
@@ -67,9 +67,10 @@ func (r *Report) Report(formatter Formatter, output io.Writer) {
 		}
 		err = formatter.Write(entryCopy, output)
 		if err != nil {
-			panic(err) // TODO panic with report.entries + error
+			return err
 		}
 	}
+	return nil
 }
 
 func (r *Report) Add(entry Entry) {

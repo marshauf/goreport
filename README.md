@@ -28,15 +28,19 @@ func main() {
 		"severity": Info,
 		"features": []string{"middleware", "filters", "formatters", "optional output", "multiple output"},
 		"simple": "unpolluted, formatted logs",
-  })
-  if r.HasError() {
+	})
+	if r.HasError() {
 		jf := &report.JsonFormatter{PrettyPrint:false}
 		sendEmail := NewEmailSender()
 		r.Report(jf, sendEmail)
 		sendDB := NewDBWriter()
-		r.Report(jf, sendDB)
-  }
-  r.AddFilters(NewConsoleFilter())
-  r.Report(NewTextFormatter(), os.Stdout)
+		if err := r.Report(jf, sendDB); err != nil {
+			r.Fatal("Could not send email report: %s", err)
+		}
+	}
+	r.AddFilters(NewConsoleFilter())
+	if err := r.Report(NewTextFormatter(), os.Stdout); err != nil {
+		panic(err) // Yes even reporting (errors) can fail
+	}
 }
 ```

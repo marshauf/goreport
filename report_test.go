@@ -6,18 +6,13 @@ import (
 )
 
 func TestReport(t *testing.T) {
-	defer func() {
-		if r := recover(); r != nil {
-			t.Errorf("Recovered from a panic: %v", r)
-		}
-	}()
-
 	var (
-		b  *bytes.Buffer = new(bytes.Buffer)
-		b2 *bytes.Buffer = new(bytes.Buffer)
-		f                = NewTextFormatter()
-		r                = New()
-		r2               = New()
+		err error
+		b   *bytes.Buffer = new(bytes.Buffer)
+		b2  *bytes.Buffer = new(bytes.Buffer)
+		f                 = NewTextFormatter()
+		r                 = New()
+		r2                = New()
 	)
 	if r == nil {
 		t.Fatal("Report is nil")
@@ -67,8 +62,14 @@ func TestReport(t *testing.T) {
 
 	r.AddFilters(NewConsoleFilter(), NewSeverityFilter(3))
 
-	r.Report(f, b)
-	r.Report(f, b2)
+	err = r.Report(f, b)
+	if err != nil {
+		t.Error(err)
+	}
+	err = r.Report(f, b2)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if b.String() != b2.String() {
 		t.Error("b != b2")
@@ -81,15 +82,14 @@ func TestReport(t *testing.T) {
 	r2.Fatal("%s", "fatal")
 	r2.Panic("%s", "panic")
 	b.Reset()
-	r2.Report(NewJsonFormatter(), b)
+	err = r2.Report(NewJsonFormatter(), b)
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestReadmeExample(t *testing.T) {
-	defer func() {
-		if r := recover(); r != nil {
-			t.Errorf("Recovered from a panic: %v", r)
-		}
-	}()
+	var err error
 
 	r := New()
 	r.Info("Simple log reports with %s.", "goreport")
@@ -103,10 +103,16 @@ func TestReadmeExample(t *testing.T) {
 		sendEmail := NewEmailSender()
 		r.Report(jf, sendEmail)
 		sendDB := NewDBWriter()
-		r.Report(jf, sendDB)
+		err = r.Report(jf, sendDB)
+		if err != nil {
+			t.Error(err)
+		}
 	}
 	r.AddFilters(NewConsoleFilter())
-	r.Report(NewTextFormatter(), &NullWriter{}) // os.Stdout
+	err = r.Report(NewTextFormatter(), &NullWriter{}) // os.Stdout
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 type NullWriter struct{}
