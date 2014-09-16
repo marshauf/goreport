@@ -83,3 +83,42 @@ func TestReport(t *testing.T) {
 	b.Reset()
 	r2.Report(NewJsonFormatter(), b)
 }
+
+func TestReadmeExample(t *testing.T) {
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("Recovered from a panic: %v", r)
+		}
+	}()
+
+	r := New()
+	r.Info("Simple log reports with %s.", "goreport")
+	r.Add(Entry{
+		"severity": Info,
+		"features": []string{"middleware", "filters", "formatters", "optional output", "multiple output"},
+		"simple":   "unpolluted, formatted logs",
+	})
+	if r.HasError() {
+		jf := &JsonFormatter{PrettyPrint: false}
+		sendEmail := NewEmailSender()
+		r.Report(jf, sendEmail)
+		sendDB := NewDBWriter()
+		r.Report(jf, sendDB)
+	}
+	r.AddFilters(NewConsoleFilter())
+	r.Report(NewTextFormatter(), &NullWriter{}) // os.Stdout
+}
+
+type NullWriter struct{}
+
+func (w *NullWriter) Write(b []byte) (int, error) {
+	return len(b), nil
+}
+
+func NewDBWriter() *NullWriter {
+	return &NullWriter{}
+}
+
+func NewEmailSender() *NullWriter {
+	return &NullWriter{}
+}
