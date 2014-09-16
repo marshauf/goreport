@@ -26,7 +26,7 @@ func TestReport(t *testing.T) {
 		t.Fatal("TextFormatter is nil")
 	}
 
-	// Try to uncommon, not intended inputs to r.Log
+	// Try uncommon, not intended inputs to r.Log
 	r.Log(nil, "", nil)
 	r.Log(nil, "", f.Write)
 

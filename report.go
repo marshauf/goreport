@@ -81,12 +81,31 @@ func (r *Report) Add(entry Entry) {
 	r.n++
 	return
 }
+
 func (r *Report) AddFilters(filters ...Filter) {
 	if r.Filters == nil {
 		r.Filters = filters
 		return
 	}
 	r.Filters = append(r.Filters, filters...)
+}
+
+func (r *Report) HasSeverity(severity Severity) bool {
+	for _, v := range r.entries {
+		if s, ok := v[EntryKeySeverity]; ok {
+			switch es := s.(type) {
+			case Severity:
+				if es.Less(severity.Severity()) == false {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func (r *Report) HasError() bool {
+	return r.HasSeverity(Error)
 }
 
 func (r *Report) filter(entry Entry) bool {

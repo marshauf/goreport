@@ -11,6 +11,7 @@ var (
 
 type Severity interface {
 	String() string
+	Severity() int
 	Less(int) bool
 }
 
@@ -33,4 +34,8 @@ func (l *Level) String() string {
 // Less reports if this level of severity is less severe than v.
 func (l *Level) Less(v int) bool {
 	return l.Value < v
+}
+
+func (l *Level) Severity() int {
+	return l.Value
 }
