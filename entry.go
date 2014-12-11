@@ -15,3 +15,8 @@ func (e Entry) Copy() Entry {
 	}
 	return c
 }
+
+func (e Entry) Add(key string, value interface{}) Entry {
+	e[key] = value
+	return e
+}

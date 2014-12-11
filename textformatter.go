@@ -26,7 +26,7 @@ func (f *TextFormatter) Write(entry Entry, w io.Writer) error {
 		case string, error: // Is of type string or has function String() string
 			_, err = fmt.Fprintf(w, "%s", severity)
 		default:
-			_, err = fmt.Fprintf(w, "%v", severity)
+			_, err = fmt.Fprintf(w, "%+v", severity)
 		}
 
 		if err != nil {
@@ -46,7 +46,7 @@ func (f *TextFormatter) Write(entry Entry, w io.Writer) error {
 		case func(Entry) string:
 			_, err = fmt.Fprintf(w, " %s=%s", EntryKeyTime, t(entry))
 		default:
-			_, err = fmt.Fprintf(w, "(%v)", t)
+			_, err = fmt.Fprintf(w, "(%+v)", t)
 		}
 		if err != nil {
 			return err
@@ -63,7 +63,7 @@ func (f *TextFormatter) Write(entry Entry, w io.Writer) error {
 		case func(Entry) string:
 			_, err = fmt.Fprintf(w, " %s=%s", EntryKeyMessage, message(entry))
 		default:
-			_, err = fmt.Fprintf(w, " %v", message)
+			_, err = fmt.Fprintf(w, " %+v", message)
 		}
 		if err != nil {
 			return err
@@ -83,7 +83,7 @@ func (f *TextFormatter) Write(entry Entry, w io.Writer) error {
 			case func(Entry) string:
 				_, err = fmt.Fprintf(w, " %s=%s", key, v(entry))
 			default:
-				_, err = fmt.Fprintf(w, " %s=%v", key, v)
+				_, err = fmt.Fprintf(w, " %s=%+v", key, v)
 			}
 		}
 	}

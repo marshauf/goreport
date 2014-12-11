@@ -22,36 +22,36 @@ func New() *Report {
 	}
 }
 
-func (r *Report) Debug(format string, args ...interface{}) {
-	r.Log(Debug, format, args...)
+func (r *Report) Debug(format string, args ...interface{}) Entry {
+	return r.Log(Debug, format, args...)
 }
 
-func (r *Report) Info(format string, args ...interface{}) {
-	r.Log(Info, format, args...)
+func (r *Report) Info(format string, args ...interface{}) Entry {
+	return r.Log(Info, format, args...)
 }
 
-func (r *Report) Warning(format string, args ...interface{}) {
-	r.Log(Warning, format, args...)
+func (r *Report) Warning(format string, args ...interface{}) Entry {
+	return r.Log(Warning, format, args...)
 }
 
-func (r *Report) Error(format string, args ...interface{}) {
-	r.Log(Error, format, args...)
+func (r *Report) Error(format string, args ...interface{}) Entry {
+	return r.Log(Error, format, args...)
 }
 
-func (r *Report) Fatal(format string, args ...interface{}) {
-	r.Log(Fatal, format, args...)
+func (r *Report) Fatal(format string, args ...interface{}) Entry {
+	return r.Log(Fatal, format, args...)
 }
 
-func (r *Report) Panic(format string, args ...interface{}) {
-	r.Log(Panic, format, args...)
+func (r *Report) Panic(format string, args ...interface{}) Entry {
+	return r.Log(Panic, format, args...)
 }
 
-func (r *Report) Log(s Severity, format string, args ...interface{}) {
+func (r *Report) Log(s Severity, format string, args ...interface{}) Entry {
 	entry := make(Entry)
 	entry[EntryKeySeverity] = s
 	entry[EntryKeyTime] = time.Now()
 	entry[EntryKeyMessage] = fmt.Sprintf(format, args...)
-	r.Add(entry)
+	return r.Add(entry)
 }
 
 func (r *Report) Report(formatter Formatter, output io.Writer) error {
@@ -73,14 +73,17 @@ func (r *Report) Report(formatter Formatter, output io.Writer) error {
 	return nil
 }
 
-func (r *Report) Add(entry Entry) {
+func (r *Report) Add(entry Entry) Entry {
+	if _, exists := entry[EntryKeyTime]; exists == false {
+		entry[EntryKeyTime] = time.Now()
+	}
 	if r.n >= len(r.entries) {
 		r.entries = append(r.entries, entry)
 	} else {
 		r.entries[r.n] = entry
 	}
 	r.n++
-	return
+	return entry
 }
 
 func (r *Report) AddFilters(filters ...Filter) {

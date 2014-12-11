@@ -44,6 +44,7 @@ func NewConsoleFilter() Filter {
 func (f *ConsoleFilter) Filter(entry Entry) bool {
 	for key, value := range entry {
 		switch s := value.(type) {
+		// TODO Color more than just the severity text?
 		case Severity:
 			if color, ok := f.SeverityColor[s]; ok {
 				entry[key] = fmt.Sprintf("\x1b[%dm%s\x1b[0m", color, entry[key])
